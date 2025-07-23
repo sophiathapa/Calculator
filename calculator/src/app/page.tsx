@@ -1,9 +1,6 @@
 "use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Outdent } from "lucide-react";
-import { checkIsRoutePPREnabled } from "next/dist/server/lib/experimental/ppr";
-import { Inter } from "next/font/google";
 
 const keys = [
   ["AC", "+/-", "%", "/"],
@@ -17,14 +14,14 @@ const operators = ["+", "-", "/", "*", "="];
 
 const symbols = ["AC", "+/-", "%"];
 
-const operator = ["+", "-", "/", "*", "."];
+const numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
 const onlyOperator = ["+", "-", "/", "*"];
 
 const Calculator = () => {
   const [output, setOutput] = useState("");
 
-  const handleCalculation = (val) => {
+  const handleCalculation = (val: string) => {
     const lastChar = output?.toString().slice(-1);
     const secondLastChar = output?.toString().slice(-2, -1);
 
@@ -40,14 +37,13 @@ const Calculator = () => {
       case "=":
         // if(output.includes('%'))
         //   setOutput(output/10)
-        if(output.includes('%')){
-          const value = output.slice(0,-1)
-          console.log(value)
+        if (output.includes("%")) {
+          const value = output.slice(0, -1);
+          console.log(value);
           // setOutput(String(value/100))
-        }
-        else{
+        } else {
           const result = eval(output);
-        setOutput(String(result));
+          setOutput(String(result));
         }
         break;
 
@@ -56,7 +52,7 @@ const Calculator = () => {
         break;
 
       case "*":
-        if (lastChar === "/") setOutput(output.slice(0, -1) + val)
+        if (lastChar === "/") setOutput(output.slice(0, -1) + val);
         else if (lastChar === "+") setOutput(output.slice(0, -1) + val);
         else if (lastChar === "-") setOutput(output.slice(0, -1) + val);
         else if (lastChar === "*") setOutput(output);
@@ -82,7 +78,6 @@ const Calculator = () => {
         else if (lastChar === "-") setOutput(output);
         else setOutput(output + val);
         break;
-
 
       case "del":
         setOutput(output.slice(0, -1));
@@ -113,30 +108,45 @@ const Calculator = () => {
 
         break;
 
-      // case '+/-':
-      //   const segment = output.split(/[*/]/)
-      //   let currentSegment = segment[segment.length-1]
-      //   if (currentSegment.includes('-')) {
-      //     let integer = parseInt(currentSegment)
-      //     integer *= -1
-      //     const newsegment = String(integer)
-      //      segment[segment.length-1] = newsegment
-      //      const newl = segment.toString()
-      //      console.log(newl)
-      //      setOutput(newl)
-      //   } 
-      //    console.log(output)
-      //    break
-
+      case "+/-":
+        if (numbers.includes(lastChar)) {
+          const match = output.match(/([+\-*/])(\d*.?\d*)$/);
+          const totalLastTerm = match[0];
+          const length = totalLastTerm.length; //  9/-3
+          const digit = match[2];
+          const index = -length;
+          if (match[1] === "-") {
+            const result1 = output.slice(0, index);
+            const result = output.slice(0, index) + "+" + digit;
+            setOutput(result);
+          } else if (match[1] === "+") {
+            const result = output.slice(0, index) + "-" + digit;
+            setOutput(result);
+          } else if (
+            totalLastTerm.includes("*") ||
+            totalLastTerm.includes("/")
+          ) {
+            if (totalLastTerm.includes("*-") || totalLastTerm.includes("/-")) {
+              const index2 = -match[2].length;
+              const result = output.slice(0, index2) + digit.slice(1);
+              setOutput(result);
+            } else {
+              const result = output.slice(0, index + 1) + "-" + digit;
+              setOutput(result);
+            }
+          }
+        } else {
+          setOutput(output);
+        }
+        break;
 
       default:
         if (/^[1-9]$/.test(val)) {
-          if (output === "0") setOutput(val)
+          if (output === "0") setOutput(val);
           else if (lastChar === "0" && onlyOperator.includes(secondLastChar)) {
             setOutput(output.slice(0, -1) + val);
           } else setOutput(output + val);
-        } 
-        else setOutput(output + val);
+        } else setOutput(output + val);
 
         break;
     }
