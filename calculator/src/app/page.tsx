@@ -35,17 +35,23 @@ const Calculator = () => {
 
     switch (val) {
       case "=":
-        // if(output.includes('%'))
-        //   setOutput(output/10)
         if (output.includes("%")) {
-          const value = output.slice(0, -1);
-          console.log(value);
-          // setOutput(String(value/100))
+          let expression = output.replace(/(\d+.?\d+)%/g, "($1/100)");
+          const result = eval(expression);
+          setOutput(String(result));
+          // const matchpercentage = output.match((/[]/))
+          // const value = output.slice(0, -1);
+          // const result = eval(value)
+          // const percentage = (result)/100
+          // console.log(percentage)
+          // setOutput(String(percentage))
+          // console.log(output)
         } else {
           const result = eval(output);
           setOutput(String(result));
         }
         break;
+
 
       case "AC":
         setOutput("");
@@ -106,6 +112,10 @@ const Calculator = () => {
           } else setOutput(output + val);
         }
 
+        break;
+
+      case "%":
+        setOutput(output+ val)
         break;
 
       case "+/-":
