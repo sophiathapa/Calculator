@@ -36,22 +36,14 @@ const Calculator = () => {
     switch (val) {
       case "=":
         if (output.includes("%")) {
-          let expression = output.replace(/(\d+.?\d+)%/g, "($1/100)");
+          let expression = output.replace(/(\d*\.?\d*)%/g, "($1/100)");
           const result = eval(expression);
           setOutput(String(result));
-          // const matchpercentage = output.match((/[]/))
-          // const value = output.slice(0, -1);
-          // const result = eval(value)
-          // const percentage = (result)/100
-          // console.log(percentage)
-          // setOutput(String(percentage))
-          // console.log(output)
         } else {
           const result = eval(output);
           setOutput(String(result));
         }
         break;
-
 
       case "AC":
         setOutput("");
@@ -115,34 +107,39 @@ const Calculator = () => {
         break;
 
       case "%":
-        setOutput(output+ val)
+        setOutput(output + val);
         break;
 
       case "+/-":
         if (numbers.includes(lastChar)) {
-          const match = output.match(/([+\-*/])(\d*.?\d*)$/);
-          const totalLastTerm = match[0];
-          const length = totalLastTerm.length; //  9/-3
-          const digit = match[2];
-          const index = -length;
-          if (match[1] === "-") {
-            const result1 = output.slice(0, index);
-            const result = output.slice(0, index) + "+" + digit;
-            setOutput(result);
-          } else if (match[1] === "+") {
-            const result = output.slice(0, index) + "-" + digit;
-            setOutput(result);
-          } else if (
-            totalLastTerm.includes("*") ||
-            totalLastTerm.includes("/")
-          ) {
-            if (totalLastTerm.includes("*-") || totalLastTerm.includes("/-")) {
-              const index2 = -match[2].length;
-              const result = output.slice(0, index2) + digit.slice(1);
+          const search = output.match(/([+\-*/])(\d*\.?\d*)$/);
+          if (search) {
+            const totalLastTerm = search[0];
+            const length = totalLastTerm.length;
+            const digit = search[2];
+            const index = -length;
+            if (search[1] === "-") {
+              const result1 = output.slice(0, index);
+              const result = output.slice(0, index) + "+" + digit;
               setOutput(result);
-            } else {
-              const result = output.slice(0, index + 1) + "-" + digit;
+            } else if (search[1] === "+") {
+              const result = output.slice(0, index) + "-" + digit;
               setOutput(result);
+            } else if (
+              totalLastTerm.includes("*") ||
+              totalLastTerm.includes("/")
+            ) {
+              if (
+                totalLastTerm.includes("*-") ||
+                totalLastTerm.includes("/-")
+              ) {
+                const index2 = -search[2].length;
+                const result = output.slice(0, index2) + digit.slice(1);
+                setOutput(result);
+              } else {
+                const result = output.slice(0, index + 1) + "-" + digit;
+                setOutput(result);
+              }
             }
           }
         } else {
